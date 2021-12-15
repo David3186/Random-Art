@@ -1,6 +1,6 @@
 
 window.onload = function () {
-    var DEPTH = 6;
+    var DEPTH = 10;
     //Grey Canvas
 
     
@@ -51,8 +51,8 @@ window.onload = function () {
 
         DEPTH = parseInt(depthField.value)
 
-        if(isNaN(DEPTH) || DEPTH <= 0 || DEPTH > 13) {
-            DEPTH = 6
+        if(isNaN(DEPTH) || DEPTH <= 0 || DEPTH > 20) {
+            DEPTH = 10;
         }
 
         document.body.removeChild(greyImage);
@@ -109,7 +109,7 @@ function imagifyGrey(imageData, expression) {
             imageData.data[4 * (i * imageData.width + j)] = color;
             imageData.data[4 * (i * imageData.width + j) + 1] = color;
             imageData.data[4 * (i * imageData.width + j) + 2] = color;
-            imageData.data[4 * (i * imageData.width + j) + 3] = 255;
+            imageData.data[4 * (i * imageData.width + j) + 3] = 125*Math.sin(color) + 125;
         }
     }
 
@@ -127,7 +127,7 @@ function imagifyColor(imageData, expression1, expression2, expression3) {
             imageData.data[4 * (i * imageData.width + j)] = red;
             imageData.data[4 * (i * imageData.width + j) + 1] = green;
             imageData.data[4 * (i * imageData.width + j) + 2] = blue;
-            imageData.data[4 * (i * imageData.width + j) + 3] = 255;
+            imageData.data[4 * (i * imageData.width + j) + 3] = 125*Math.sin(blue) + 125;
         }
     }
 
@@ -135,7 +135,7 @@ function imagifyColor(imageData, expression1, expression2, expression3) {
 
 }
 
-var NUM_TYPE_EXPR = 6;
+var NUM_TYPE_EXPR = 7;
 
 function buildVarX() {
     return { name: "VarX" };
@@ -155,6 +155,10 @@ function buildTimes(e1, e2) {
 function buildAverage(e1, e2) {
     return { name: "Average", e1: e1, e2: e2 };
 }
+function buildPower(e1,e2){
+    return {name: "Power", e1: e1, e2: e2}
+}
+
 function evaluate(e, x, y) {
     switch (e.name) {
         case ("VarX"):
@@ -174,6 +178,9 @@ function evaluate(e, x, y) {
             break;
         case ("Average"):
             return (evaluate(e.e1, x, y) + evaluate(e.e2, x, y)) / 2;
+            break;
+        case ("Power"):
+            return Math.pow(Math.abs(evaluate(e.e1,x,y)), evaluate(e.e2,x,y) + 1);
             break;
     }
 }
@@ -197,10 +204,13 @@ function stringify(e) {
         case ("Average"):
             return "(" + stringify(e.e1) + " + " + stringify(e.e2) + ") / 2";
             break;
+        case ("Power"):
+            return "(" + stringify(e.e1) + ")^(" + stringify(e.e2) + ") + 1";
+            break;
     }
 }
 function buildRandomExpr(depth) {
-    if (depth == 0) {
+    if (depth == 0 || depth == 1) {
         var rando_1 = Math.random();
         if (rando_1 < 0.5)
             return buildVarX();
@@ -216,10 +226,13 @@ function buildRandomExpr(depth) {
             return buildCosine(buildRandomExpr(depth - 1));
             break;
         case (2):
-            return buildTimes(buildRandomExpr(depth - 1), buildRandomExpr(depth - 1));
+            return buildTimes(buildRandomExpr(depth - 2), buildRandomExpr(depth - 2));
             break;
         case (3):
-            return buildAverage(buildRandomExpr(depth - 1), buildRandomExpr(depth - 1));
+            return buildAverage(buildRandomExpr(depth - 2), buildRandomExpr(depth - 2));
+            break;
+        case (4):
+            return buildPower(buildRandomExpr(depth - 2), buildRandomExpr(depth - 2));
             break;
     }
 }
