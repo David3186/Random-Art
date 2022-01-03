@@ -109,7 +109,7 @@ function imagifyGrey(imageData, expression) {
             imageData.data[4 * (i * imageData.width + j)] = color;
             imageData.data[4 * (i * imageData.width + j) + 1] = color;
             imageData.data[4 * (i * imageData.width + j) + 2] = color;
-            imageData.data[4 * (i * imageData.width + j) + 3] = 255;
+            imageData.data[4 * (i * imageData.width + j) + 3] = 125*Math.sin(color) + 125;
         }
     }
 
@@ -138,7 +138,7 @@ function imagifyColor(imageData, expression1, expression2, expression3) {
 
 }
 
-var NUM_TYPE_EXPR = 6;
+var NUM_TYPE_EXPR = 7;
 
 function buildVarX() {
     return { name: "VarX" };
@@ -158,6 +158,10 @@ function buildTimes(e1, e2) {
 function buildAverage(e1, e2) {
     return { name: "Average", e1: e1, e2: e2 };
 }
+function buildPower(e1,e2){
+    return {name: "Power", e1: e1, e2: e2}
+}
+
 function evaluate(e, x, y) {
     switch (e.name) {
         case ("VarX"):
