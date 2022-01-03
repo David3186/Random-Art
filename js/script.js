@@ -1,14 +1,13 @@
 
 window.onload = function () {
-    var DEPTH = 6;
+    var DEPTH = 10;
     //Grey Canvas
 
-    
+
     var canvas = document.createElement("canvas");
     var ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 500;
-
 
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -51,8 +50,8 @@ window.onload = function () {
 
         DEPTH = parseInt(depthField.value)
 
-        if(isNaN(DEPTH) || DEPTH <= 0 || DEPTH > 13) {
-            DEPTH = 6
+        if (isNaN(DEPTH) || DEPTH <= 0 || DEPTH >1000) {
+            DEPTH = 10;
         }
 
         document.body.removeChild(greyImage);
@@ -102,7 +101,8 @@ function convertCanvasToImage(canvas) {
 }
 
 function imagifyGrey(imageData, expression) {
-
+    console.log("Grey expression:")
+    console.log(stringify(expression));
     for (let i = 0; i < imageData.height; i++) {
         for (let j = 0; j < imageData.width; j++) {
             let color = 255 * evaluate(expression, 2 * (j / imageData.width) - 1, 2 * (i / imageData.height) - 1);
@@ -117,7 +117,10 @@ function imagifyGrey(imageData, expression) {
 }
 
 function imagifyColor(imageData, expression1, expression2, expression3) {
-
+    console.log("Color expressions:")
+    console.log(stringify(expression1));
+    console.log(stringify(expression2));
+    console.log(stringify(expression3));
     for (let i = 0; i < imageData.height; i++) {
         for (let j = 0; j < imageData.width; j++) {
             let red = 255 * evaluate(expression1, 2 * (j / imageData.width) - 1, 2 * (i / imageData.height) - 1);
@@ -127,7 +130,7 @@ function imagifyColor(imageData, expression1, expression2, expression3) {
             imageData.data[4 * (i * imageData.width + j)] = red;
             imageData.data[4 * (i * imageData.width + j) + 1] = green;
             imageData.data[4 * (i * imageData.width + j) + 2] = blue;
-            imageData.data[4 * (i * imageData.width + j) + 3] = 255;
+            imageData.data[4 * (i * imageData.width + j) + 3] = 255
         }
     }
 
@@ -159,48 +162,36 @@ function evaluate(e, x, y) {
     switch (e.name) {
         case ("VarX"):
             return x;
-            break;
         case ("VarY"):
             return y;
-            break;
         case ("Sine"):
             return Math.sin(Math.PI * evaluate(e.e1, x, y));
-            break;
         case ("Cosine"):
             return Math.cos(Math.PI * evaluate(e.e1, x, y));
-            break;
         case ("Times"):
             return evaluate(e.e1, x, y) * evaluate(e.e2, x, y);
-            break;
         case ("Average"):
             return (evaluate(e.e1, x, y) + evaluate(e.e2, x, y)) / 2;
-            break;
     }
 }
 function stringify(e) {
     switch (e.name) {
         case ("VarX"):
             return "x";
-            break;
         case ("VarY"):
             return "y";
-            break;
         case ("Sine"):
             return "sin(" + stringify(e.e1) + ")";
-            break;
         case ("Cosine"):
             return "cos(" + stringify(e.e1) + ")";
-            break;
         case ("Times"):
             return stringify(e.e1) + " * " + stringify(e.e2);
-            break;
         case ("Average"):
             return "(" + stringify(e.e1) + " + " + stringify(e.e2) + ") / 2";
-            break;
     }
 }
 function buildRandomExpr(depth) {
-    if (depth == 0) {
+    if (depth <= 1) {
         var rando_1 = Math.random();
         if (rando_1 < 0.5)
             return buildVarX();
@@ -211,24 +202,15 @@ function buildRandomExpr(depth) {
     switch (rando) {
         case (0):
             return buildSine(buildRandomExpr(depth - 1));
-            break;
         case (1):
             return buildCosine(buildRandomExpr(depth - 1));
-            break;
         case (2):
-            return buildTimes(buildRandomExpr(depth - 1), buildRandomExpr(depth - 1));
-            break;
+            return buildTimes(buildRandomExpr(depth / 2 - 1), buildRandomExpr(depth / 2 - 1));
         case (3):
-            return buildAverage(buildRandomExpr(depth - 1), buildRandomExpr(depth - 1));
-            break;
+            return buildAverage(buildRandomExpr(depth / 2 - 1), buildRandomExpr(depth / 2 - 1));
     }
 }
 var expr1 = buildAverage(buildSine(buildVarY()), buildCosine(buildVarX()));
 var expr2 = buildTimes(buildSine(buildVarX()), buildCosine(buildVarX()));
-console.log(stringify(expr1));
-console.log(evaluate(expr1, 0, Math.PI / 2));
-console.log(stringify(expr2));
-console.log(evaluate(expr2, Math.PI / 2, 4));
+
 var expr3 = buildRandomExpr(6);
-console.log(stringify(expr3));
-console.log(evaluate(expr3, 0.5, 0.3));
