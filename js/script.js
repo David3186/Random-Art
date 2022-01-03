@@ -1,6 +1,10 @@
+const NUM_TYPE_EXPR = 6;
+const DEFAULT_DEPTH = 25;
 
 window.onload = function () {
-    var DEPTH = 10;
+
+
+    var DEPTH = DEFAULT_DEPTH;
     //Grey Canvas
 
 
@@ -51,7 +55,7 @@ window.onload = function () {
         DEPTH = parseInt(depthField.value)
 
         if (isNaN(DEPTH) || DEPTH <= 0 || DEPTH >1000) {
-            DEPTH = 10;
+            DEPTH = DEFAULT_DEPTH;
         }
 
         document.body.removeChild(greyImage);
@@ -137,8 +141,6 @@ function imagifyColor(imageData, expression1, expression2, expression3) {
     return imageData;
 
 }
-
-var NUM_TYPE_EXPR = 7;
 
 function buildVarX() {
     return { name: "VarX" };
